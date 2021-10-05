@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="professioni" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>com.seta.domain.User</class>
+        <class>com.seta.domain.SoggettiAttuatori</class>
+        <class>com.seta.domain.Docenti</class>
+        <class>com.seta.domain.ProgettiFormativi</class>
+        <class>com.seta.domain.Allievi</class>
+        <class>com.seta.domain.Comuni</class>
+        <class>com.seta.domain.StatiPrg</class>
+        <class>com.seta.domain.DocumentiPrg</class>
+        <class>com.seta.domain.TipoDoc</class>
+        <class>com.seta.domain.Path</class>
+        <class>com.seta.domain.Tracking</class>
+        <class>com.seta.domain.TitoliStudio</class>
+        <class>com.seta.domain.Pagina</class>
+        <class>com.seta.domain.Email</class>
+        <class>com.seta.domain.CPI</class>
+        <class>com.seta.domain.SediFormazione</class>
+        <class>com.seta.domain.Condizione_Mercato</class>
+        <class>com.seta.domain.Storico_Prg</class>
+        <class>com.seta.domain.ModificheStatoPrg</class>
+        <class>com.seta.domain.TipoDoc_Allievi</class>
+        <class>com.seta.domain.Documenti_Allievi</class>
+        <class>com.seta.domain.Selfiemployment_Prestiti</class>
+        <class>com.seta.domain.StatoPartecipazione</class>
+        <class>com.seta.domain.Cloud</class>
+        <class>com.seta.domain.EstensioniFile</class>
+        <class>com.seta.domain.Estrazioni</class>
+        <class>com.seta.domain.NomiProgetto</class>
+        <class>com.seta.domain.FasceDocenti</class>
+        <class>com.seta.domain.Condizione_Lavorativa</class>
+        <class>com.seta.domain.Storico_ModificheInfo</class>
+        <class>com.seta.domain.Allievi_Pregresso</class>
+        <class>com.seta.domain.Faq</class>
+        <class>com.seta.domain.TipoFaq</class>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <properties>
+            <property name="eclipselink.logging.level" value="SEVERE"/>
+            <!--cache-->
+            <property name="eclipselink.query-results-cache" value="false"/>
+            <property name="eclipselink.cache.shared.default" value="false"/>
+            <property name="eclipselink.cache.size.default" value="0"/>
+            <property name="eclipselink.cache.type.default" value="None" />
+            <property name="javax.persistence.schema-generation.database.action" value="create-or-extend-tables" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />  
+                      
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/professioni?useSSL=false"/>
+            <property name="javax.persistence.jdbc.user" value="admin"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="Xray8888$$!"/>
+        </properties>
+    </persistence-unit>
+</persistence>
