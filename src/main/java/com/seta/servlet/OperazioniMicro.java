@@ -1385,7 +1385,7 @@ public class OperazioniMicro extends HttpServlet {
             Part part = request.getPart("file");
             if (part != null && part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0) {
                 ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
-                DocumentiPrg registroFADtemp = pf.getDocumenti().stream().filter(d1 -> d1.getId() == 30L).findAny().orElse(null);
+                DocumentiPrg registroFADtemp = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 30L).findAny().orElse(null);
                 String destpath = registroFADtemp.getPath() + RandomStringUtils.randomAlphabetic(10)
                         + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));;
                 part.write(destpath);
