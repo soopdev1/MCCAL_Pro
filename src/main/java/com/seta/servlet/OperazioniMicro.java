@@ -255,6 +255,9 @@ public class OperazioniMicro extends HttpServlet {
                 p.setMotivo(null);
                 e.merge(p);
                 e.commit();
+                
+                //INVIO MAIL
+                    SendMailJet.notifica_cambiostato_SA(e, p);
             }
 
             if (p.getStato().getId().equals("C")) {
@@ -286,6 +289,8 @@ public class OperazioniMicro extends HttpServlet {
             p.setStato(e.getEm().find(StatiPrg.class, p.getStato().getId().replace("1", "") + "E"));
             e.merge(p);
             e.commit();
+            //INVIO MAIL
+                    SendMailJet.notifica_cambiostato_SA(e, p);
             resp.addProperty("result", true);
         } catch (PersistenceException ex) {
             ex.printStackTrace();

@@ -32,6 +32,7 @@ import com.seta.domain.TipoFaq;
 import com.seta.domain.TitoliStudio;
 import com.seta.domain.User;
 import com.seta.entity.Presenti;
+import com.seta.util.SendMailJet;
 import com.seta.util.Utility;
 import java.io.File;
 import java.io.IOException;
@@ -513,9 +514,8 @@ public class OperazioniSA extends HttpServlet {
             e.flush();
 
             //setto allievi
-            Allievi a = new Allievi();
             for (String s : request.getParameterValues("allievi[]")) {
-                a = e.getEm().find(Allievi.class, Long.parseLong(s));
+                Allievi a = e.getEm().find(Allievi.class, Long.parseLong(s));
                 a.setCanaleconoscenza(request.getParameter("knowledge_" + s + "_input"));
                 a.setProgetto(p);
                 e.merge(a);
@@ -571,7 +571,8 @@ public class OperazioniSA extends HttpServlet {
             e.merge(p);
             e.persist(new Storico_Prg("Creato", new Date(), p, p.getStato()));//storico progetto
             e.commit();
-
+            //INVIO MAIL
+            SendMailJet.notifica_Controllo_MC(e, p);
             resp.addProperty("result", true);
         } catch (PersistenceException | ParseException ex) {
             e.rollBack();
@@ -907,6 +908,10 @@ public class OperazioniSA extends HttpServlet {
                 }
                 e.merge(p);
                 e.commit();
+
+                //INVIO MAIL
+                SendMailJet.notifica_Controllo_MC(e, p);
+                
                 resp.addProperty("result", true);
             } else {
                 resp.addProperty("result", false);
