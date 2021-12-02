@@ -326,11 +326,13 @@
                                             </div>
                                         </div>
                                         <!--29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST-->
-                                        <div class="row" style="display: none;">
+                                        <div class="row separator"><hr></div>
+                                        <div class="col-lg-6">
                                             <div class="col-lg-6">
                                                 <label>Importo riconosciuto al SA (formato € ___.__1.234,56)</label>
                                                 <div>
-                                                    <input class="form-control col-lg-6" name="kt_inputmask_7" id="kt_inputmask_7" data-inputmask="'removeMaskOnSubmit': true" type="text"/>
+                                                    <input class="form-control col-lg-6" name="kt_inputmask_7" 
+                                                           id="kt_inputmask_7" data-inputmask="'removeMaskOnSubmit': true" type="text"/>
                                                 </div>
                                             </div>
                                         </div>              
@@ -343,7 +345,7 @@
                                     </form>
                                     <div class="form-group">
                                         <div class="kt-form__actions">
-                                            <a href="javascript:void(0);" class="btn btn-io" id="submit"><font color='white'>Salva</font></a>
+                                            <a href="javascript:void(0);" class="btn btn-io" id="submit"><font color='white'><i class="fa fa-save"></i> Salva</font></a>
                                             <button onclick="location.reload();" class="btn btn-io-n"><font color='white'>Reset</font></button>
                                         </div>
                                     </div>
@@ -407,12 +409,12 @@
                 var err = false;
                 err = checkObblFields() ? true : err;
                 //29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
-//                if ($('#kt_inputmask_7').inputmask('unmaskedvalue') != "") {
-//                    $('#kt_inputmask_7').removeClass("is-invalid").addClass("is-valid");
-//                } else {
-//                    $('#kt_inputmask_7').removeClass("is-valid").addClass("is-invalid");
-//                    err = true;
-//                }
+                if ($('#kt_inputmask_7').inputmask('unmaskedvalue') !== "") {
+                    $('#kt_inputmask_7').removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $('#kt_inputmask_7').removeClass("is-valid").addClass("is-invalid");
+                    err = true;
+                }
                 return !err;
             }
 
@@ -428,7 +430,7 @@
                             var json = JSON.parse(resp);
                             closeSwal();
                             if (json.result) {
-                                var message = json.message != null ? "<h4>" + json.message + "</h4>" : "";
+                                var message = json.message !== null ? "<h4>" + json.message + "</h4>" : "";
                                 console.log(json);
 //                                if (true) {
                                 message += "<a href='<%=request.getContextPath()%>/OperazioniGeneral?type=downloadDoc&path=" + json.filedl + "' ><u><b>Clicca qui se il download non è iniziato.</b></u></a> ";//<i class='fa fa-cloud-download-alt'></i>
@@ -455,7 +457,7 @@
                 docsAllievi();
             });
             $('#allievi').select2({//setta placeholder nella multiselect
-                placeholder: "Seleziona Allievi",
+                placeholder: "Seleziona Allievi"
             });
             jQuery(document).ready(function () {
                 docsAllievi();

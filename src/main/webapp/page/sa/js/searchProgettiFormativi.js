@@ -85,7 +85,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                             if (row.stato.modifiche.docenti === 1) {
                                 option += '<a class="dropdown-item fancyBoxAntoRef" href="modifyDocentiProgetto.jsp?id=' + row.id + '"><i class="fas fa-user-edit"></i> Modifica Docenti</a>';
                             }
-                            if (row.stato.id === "FA") {
+                            if (row.stato.id === "FA" || row.stato.id === "FB" || row.stato.id === "FBE" || row.stato.id === "CE") {
                                 option += '<a class="dropdown-item fancyBoxReload" href="uploadRegistroAula.jsp?id=' + row.id + '" ><i class="flaticon2-calendar-6"></i> Carica Registro d\'Aula</a>';
                             }
                             if (row.stato.modifica_doc === 1) {

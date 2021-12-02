@@ -123,7 +123,11 @@ public class Entity {
     }
 
     public String getPath(String id) {
-        return this.em.find(Path.class, id).getUrl();
+        try {
+            return this.em.find(Path.class, id).getUrl();
+        } catch (Exception e) {
+        }
+        return null;
     }
 
     public List<Item> listaRegioni() {

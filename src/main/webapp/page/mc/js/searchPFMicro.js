@@ -1101,67 +1101,21 @@ function rendiconta(idPrg) {
     });
 }
 
-function liquida(id) {
-    var html = "<div class='form-group-marginless' id='swal_liquida'>"
-            + "<input class='form-control obbligatory' id='importo' placeholder='importo ente'>"
-            + "</div>";
-    swal.fire({
-        title: '<h2 class="kt-font-io-n"><b>Liquida Progetto</b></h2><br>',
-        html: html,
-        animation: false,
-        showCancelButton: true,
-        confirmButtonText: '&nbsp;<i class="la la-check"></i>',
-        cancelButtonText: '&nbsp;<i class="la la-close"></i>',
-        cancelButtonClass: "btn btn-io-n",
-        confirmButtonClass: "btn btn-io",
-        customClass: {
-            popup: 'animated bounceInUp'
-        },
-        onOpen: function () {
-            $("#importo").inputmask('€ 999.999.999,99', {
-                numericInput: true
-            });
-        },
-        preConfirm: function () {
-            var err = false;
-            err = checkObblFieldsContent($('#swal_liquida')) ? true : err;
-            if (!err) {
-                return new Promise(function (resolve) {
-                    resolve({
-                        "importo": $('#importo').val(),
-                    });
-                });
-            } else {
-                return false;
+function liquida(idPrg) {
+    swalConfirm("Liquida Progetto", "Sicuro di voler liquidare questo progetto?", function liquidaPrg() {
+        showLoad();
+        $.ajax({
+            type: "POST",
+            url: context + '/OperazioniMicro?type=liquidaPrg&id=' + idPrg,
+            success: function (data) {
+                closeSwal();
+                if (data.result) {
+                    swalSuccess('Successo', 'Progetto liquidato con successo');
+                    reload();
+                } else {
+                    swalError('Errore', data.message);
+                }
             }
-        },
-    }).then((result) => {
-        if (result.value) {
-            liquidaPrg(id, result.value);
-        } else {
-            swal.close();
-        }
-    });
-}
-
-function liquidaPrg(id, result) {
-    showLoad();
-    $.ajax({
-        type: "POST",
-        url: context + '/OperazioniMicro?type=liquidaPrg&id=' + id,
-        data: result,
-        success: function (data) {
-            closeSwal();
-            var json = JSON.parse(data);
-            if (json.result) {
-                reload();
-                swalSuccess("Progetto Validato", "Progetto formativo validato con successo");
-            } else {
-                swalError("Errore", json.message);
-            }
-        },
-        error: function () {
-            swalError("Errore", "Non è stato possibile validare il progetto formativo");
-        }
+        });
     });
 }

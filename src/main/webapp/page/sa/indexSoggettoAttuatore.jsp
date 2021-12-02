@@ -194,11 +194,15 @@
                             <div class="tab-pane" id="kt_widget5_tab1_content" aria-expanded="true">
                                 <div class="row">
                                     <div class="col-xl-8 col-lg-6 col-md-6" style="padding-right: 0px;">
+                                        <%if (messaggio != null) {%>
                                         <div class="row col">
                                             <div class="col-12 paddig_0_r" style="padding-bottom: 1.5rem;">
-                                                <div class="custom-redbox message paddig_0_t"><br><label style="font-size: 1.5rem; font-weight: 200;"><%=messaggio%></label></div>
+                                                <div class="custom-redbox message paddig_0_t"><br><label style="font-size: 1.5rem; font-weight: 200;">
+                                                        <%=messaggio%></label>
+                                                </div>
                                             </div>
                                         </div>
+                                        <%}%>
                                         <div class="row flex col-lg-12"  style="margin-right: 0px; padding-right: 0px;">
                                             <div class="col-xl-3 col-lg-12 col-md-6" style="padding-bottom: 1.5rem;">
                                                 <div class="one-half custom-redbox">Allievi totali<br><label style="font-size: 3rem; font-weight: 800;"><%=allievi_totali%></label></div>

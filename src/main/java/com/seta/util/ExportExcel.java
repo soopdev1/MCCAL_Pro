@@ -22,13 +22,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -46,12 +50,32 @@ public class ExportExcel {
 
     private static int colonna;
 
-    public static void main(String[] args) {
-        Entity e = new Entity();
-        Docenti d = e.getEm().find(Docenti.class, 1L);
-        e.close();
-
-        lezioniDocente(d);
+//    public static void main(String[] args) {
+//        Entity e = new Entity();
+//        Docenti d = e.getEm().find(Docenti.class, 1L);
+//        e.close();
+//
+//        lezioniDocente(d);
+//    }
+    private static String calcoladurata(double doublemhours) {
+        if (doublemhours <= 0) {
+            return "00:00:00";
+        }
+        BigDecimal bd = new BigDecimal(doublemhours * 3600000L);
+        bd.setScale(2, RoundingMode.HALF_EVEN);
+        long millis = bd.longValue();
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        millis -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(StringUtils.leftPad(String.valueOf(hours), 2, "0"));
+        sb.append(":");
+        sb.append(StringUtils.leftPad(String.valueOf(minutes), 2, "0"));
+        sb.append(":");
+        sb.append(StringUtils.leftPad(String.valueOf(seconds), 2, "0"));
+        return sb.toString();
     }
 
     public static ByteArrayOutputStream lezioniDocente(Docenti docente) {
@@ -255,7 +279,7 @@ public class ExportExcel {
             Row row = null;
 
             ProgettiFormativi p;
-            double ore_a = 0, ore_b = 0, ore_tot = 0;
+            double ore_a = 0.0, ore_b = 0.0, ore_tot = 0.0;
 
             for (Allievi a : allievi) {
                 row = sheet.createRow((short) cntriga);//riga successiva
@@ -265,7 +289,7 @@ public class ExportExcel {
                 ore_a = oreFa(p.getDocumenti(), a.getId());
                 ore_b = a.getEsito().equals("Fase B") ? oreFb(a.getDocumenti()) : 0;
                 ore_tot = ore_a + ore_b;
-
+                int ore_tot_int = new Double(ore_tot).intValue();
                 writeCell(row, a.getCognome());
                 writeCell(row, a.getNome());
                 writeCell(row, sdf.format(a.getDatanascita()));
@@ -301,11 +325,11 @@ public class ExportExcel {
                 writeCell(row, a.getIdea_impresa());
                 writeCell(row, sdf.format(p.getStart()));
                 writeCell(row, sdf.format(p.getEnd_fa()));
-                writeCell(row, String.valueOf(ore_a));
+                writeCell(row, calcoladurata(ore_a));
                 writeCell(row, a.getEsito().equals("Fase B") ? sdf.format(p.getStart_fb()) : "-");
                 writeCell(row, a.getEsito().equals("Fase B") ? sdf.format(p.getEnd_fb()) : "-");
-                writeCell(row, String.valueOf(ore_b));
-                writeCell(row, String.valueOf(ore_tot));
+                writeCell(row, calcoladurata(ore_b));
+                writeCell(row, String.valueOf(ore_tot_int));
                 writeCell(row, a.getSelfiemployement().getDescrizione());
                 writeCell(row, a.getStatopartecipazione().getId());
                 writeCell(row, a.getId().toString());
@@ -465,7 +489,7 @@ public class ExportExcel {
 
     }
 
-    private static double oreFa(List<DocumentiPrg> docs, long id) {
+    public static double oreFa(List<DocumentiPrg> docs, long id) {
         double ore = 0;
         for (DocumentiPrg d : docs) {
             if (d.getGiorno() != null) {
@@ -478,7 +502,7 @@ public class ExportExcel {
         return ore;
     }
 
-    private static double oreFb(List<Documenti_Allievi> docs) {
+    public static double oreFb(List<Documenti_Allievi> docs) {
         return docs.stream().filter(d -> d.getGiorno() != null).collect(Collectors.summingDouble(d -> d.getOrericonosciute()));
     }
 
@@ -494,7 +518,7 @@ public class ExportExcel {
     private static int countAllieviEnd(List<Allievi> allievi) {
         return allievi.stream().filter(a -> a.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()).size();
     }
-    
+
     private static List<DocumentiPrg> groupRegisterByDay(List<DocumentiPrg> registri) {
         List<DocumentiPrg> out = new ArrayList<>();
         List<DocumentiPrg> ordered = registri.stream().sorted((x, y) -> x.getGiorno().compareTo(y.getGiorno())).collect(Collectors.toList());//lista ordinata per giorno
