@@ -30,56 +30,9 @@ public class MakeTarGz {
 
     public static void createTarArchive(List<ProgettiFormativi> p_list, String file_path_name) throws IOException, ParseException {
         File f = new File(file_path_name);
-        FileOutputStream fos = new FileOutputStream(f);
-        GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
-        final TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos);
-
-        List<Allievi> allievi = new ArrayList<>();
-
-        p_list.forEach(p -> {
-            p.getDocumenti().stream()
-                    .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
-                    .forEach(d -> {
-                        try {
-                            addFilesToTarGZ(d.getPath(), p.getCip() + "/" + (d.getDocente() != null ? "Docenti/" + d.getDocente().getCognome() + "/" : ""), tarOs);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-            p.getAllievi().stream()
-                    .filter(a -> a.getStatopartecipazione().getId().equals("01")).forEach(a -> {
-                allievi.add(a);//aggiungo allievi per estrazione excel
-                a.getDocumenti().stream()
-                        .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
-                        .forEach(d -> {
-                            try {
-                                addFilesToTarGZ(d.getPath(), p.getCip() + "/Allievi/" + a.getCodicefiscale() + "/", tarOs);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        });
-            });
-        });
-
-        String excel = ExportExcel.createExcelAllievi(allievi);
-        addFilesToTarGZ(excel, "", tarOs);
-        new File(excel).deleteOnExit();
-        tarOs.close();
-        gos.close();
-        fos.flush();
-        fos.close();
-        new File(excel).delete();
-//        return f;
-    }
-
-    public static ByteArrayOutputStream createTarArchive(List<ProgettiFormativi> p_list) {
-        try {
-            ByteArrayOutputStream fos = new ByteArrayOutputStream();
-            GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
-            final TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos);
-
+        String excel;
+        try (FileOutputStream fos = new FileOutputStream(f); GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos)); TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos)) {
             List<Allievi> allievi = new ArrayList<>();
-
             p_list.forEach(p -> {
                 p.getDocumenti().stream()
                         .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
@@ -93,6 +46,15 @@ public class MakeTarGz {
                 p.getAllievi().stream()
                         .filter(a -> a.getStatopartecipazione().getId().equals("01")).forEach(a -> {
                     allievi.add(a);//aggiungo allievi per estrazione excel
+
+                    //AGGIUNGO DOC IDENTITA' ALLIEVO
+                    try {
+
+                        addFilesToTarGZ(a.getDocid(), p.getCip() + "/Allievi/" + a.getCodicefiscale() + "/", tarOs);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
                     a.getDocumenti().stream()
                             .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
                             .forEach(d -> {
@@ -104,12 +66,59 @@ public class MakeTarGz {
                             });
                 });
             });
-
-            String excel = ExportExcel.createExcelAllievi(allievi);
+            excel = ExportExcel.createExcelAllievi(allievi);
             addFilesToTarGZ(excel, "", tarOs);
             new File(excel).deleteOnExit();
-            tarOs.close();
-            gos.close();
+            fos.flush();
+        }
+
+        new File(excel).delete();
+//        return f;
+    }
+
+    public static ByteArrayOutputStream createTarArchive(List<ProgettiFormativi> p_list) {
+        try {
+            ByteArrayOutputStream fos = new ByteArrayOutputStream();
+            String excel;
+            try (GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos)); TarArchiveOutputStream tarOs = new TarArchiveOutputStream(gos)) {
+                List<Allievi> allievi = new ArrayList<>();
+                p_list.forEach(p -> {
+                    p.getDocumenti().stream()
+                            .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
+                            .forEach(d -> {
+                                try {
+                                    addFilesToTarGZ(d.getPath(), p.getCip() + "/" + (d.getDocente() != null ? "Docenti/" + d.getDocente().getCognome() + "/" : ""), tarOs);
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            });
+                    p.getAllievi().stream()
+                            .filter(a -> a.getStatopartecipazione().getId().equals("01")).forEach(a -> {
+                        allievi.add(a);//aggiungo allievi per estrazione excel
+
+                        //AGGIUNGO DOC IDENTITA' ALLIEVO
+                        try {
+
+                            addFilesToTarGZ(a.getDocid(), p.getCip() + "/Allievi/" + a.getCodicefiscale() + "/", tarOs);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        a.getDocumenti().stream()
+                                .filter(d -> d.getTipo().getEstrazione() == 1 && d.getDeleted() == 0)
+                                .forEach(d -> {
+                                    try {
+                                        addFilesToTarGZ(d.getPath(), p.getCip() + "/Allievi/" + a.getCodicefiscale() + "/", tarOs);
+                                    } catch (IOException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                });
+                    });
+                });
+                excel = ExportExcel.createExcelAllievi(allievi);
+                addFilesToTarGZ(excel, "", tarOs);
+                new File(excel).deleteOnExit();
+            }
             new File(excel).delete();
             return fos;
         } catch (Exception ex) {
@@ -124,10 +133,10 @@ public class MakeTarGz {
         tarArchive.putArchiveEntry(new TarArchiveEntry(file, entryName));
         if (file.isFile()) {
             FileInputStream fis = new FileInputStream(file);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            IOUtils.copy(bis, tarArchive);
-            tarArchive.closeArchiveEntry();
-            bis.close();
+            try (BufferedInputStream bis = new BufferedInputStream(fis)) {
+                IOUtils.copy(bis, tarArchive);
+                tarArchive.closeArchiveEntry();
+            }
         } else if (file.isDirectory()) {
             tarArchive.closeArchiveEntry();
             for (File f : file.listFiles()) {
