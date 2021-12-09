@@ -220,7 +220,7 @@ public class Login extends HttpServlet {
                 resp.addProperty("result", false);
                 resp.addProperty("message", "Ci dispiace ma Google ti ha rilevato come bot");
             }
-        } catch (IOException | ParseException | org.json.simple.parser.ParseException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             e.insertTracking(null, "saveSoggettoAttuatore Errore: " + ex.getMessage());
             resp.addProperty("result", false);
@@ -336,7 +336,7 @@ public class Login extends HttpServlet {
         JSONObject result = new JSONObject();
         try {
             result.put("result", GoogleRecaptcha.isValid(request.getParameter("g-recaptcha-response")));
-        } catch (org.json.simple.parser.ParseException ex) {
+        } catch (Exception ex) {
             result.put("result", false);
             ex.printStackTrace();
         }

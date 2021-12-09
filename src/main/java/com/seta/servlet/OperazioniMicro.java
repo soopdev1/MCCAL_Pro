@@ -64,15 +64,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import com.seta.util.Utility;
 import static com.seta.util.Utility.ctrlCheckbox;
+import static com.seta.util.Utility.estraiEccezione;
 import static com.seta.util.Utility.patternITA;
 import static com.seta.util.Utility.patternSql;
+import static com.seta.util.Utility.redirect;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Statement;
-import java.util.stream.Collectors;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -504,7 +506,7 @@ public class OperazioniMicro extends HttpServlet {
                 doc.setTipo(tipo);
                 doc.setProgetto(prg);
                 e.persist(doc);
-                if (tipo.getId() == 25) {//se sta caricando la check2
+                if (tipo.getId() == 26) {//se sta caricando la check3
                     CompilePdf.compileValutazione(prg);
                 }
             }
@@ -544,12 +546,7 @@ public class OperazioniMicro extends HttpServlet {
         JsonObject resp = new JsonObject();
         try {
             e.begin();
-            //29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
-            String prezzo = request.getParameter("kt_inputmask_7").substring(request.getParameter("kt_inputmask_7").lastIndexOf("_"));
             ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(request.getParameter("idprogetto")));
-            prg.setImporto(Double.valueOf(prezzo.replaceAll("[._]", "").replace(",", ".").trim()));
-            e.merge(prg);
-            e.commit();
 
             //14-10-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
 //            double ore_convalidate = 0;
@@ -1452,6 +1449,40 @@ public class OperazioniMicro extends HttpServlet {
         response.getWriter().close();
     }
 
+    protected void compilaeimporto(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
+        Entity e = new Entity();
+        e.begin();
+        String idpr = request.getParameter("idprogetto");
+        try {
+
+            String prezzo = request.getParameter("kt_inputmask_7");
+            while (prezzo.length() < 2) {
+                prezzo = "0" + prezzo;
+            }
+            if (prezzo.length() > 2) {
+                String integer = StringUtils.substring(prezzo, 0, prezzo.length() - 2);
+                String decimal = StringUtils.substring(prezzo, prezzo.length() - 2);
+                prezzo = integer + "." + decimal;
+            } else {
+                prezzo = "0." + prezzo;
+            }
+
+            ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
+            prg.setImporto(Double.valueOf(prezzo));
+            e.merge(prg);
+            e.commit();
+            redirect(request, response, "page/mc/uploadCL.jsp?id=" + idpr);
+        } catch (Exception ex) {
+            e.rollBack();
+            ex.printStackTrace();
+            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()),
+                    "OperazioniMicro caricaregistroFAD: " + estraiEccezione(ex));
+            redirect(request, response, "page/mc/uploadCL.jsp?id=" + idpr);
+        }
+
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -1575,6 +1606,9 @@ public class OperazioniMicro extends HttpServlet {
                     break;
                 case "cambiaDocReportFad":
                     cambiaDocReportFad(request, response);
+                    break;
+                case "compilaeimporto":
+                    compilaeimporto(request, response);
                     break;
                 default:
                     break;

@@ -35,6 +35,10 @@
             if(!p.getStato().getId().equals("FA")){//serve a non far vedere i documenti che non deve caricare il micro
                 tipo_doc_obbl = e.getTipoDoc(p.getStato());
             }
+            
+            boolean showimporto = p.getStato().getId().equals("CL");
+            String startimporto = p.getImporto() == 0 ? "" : String.format("%.2f", p.getImporto());
+            
             List<DocumentiPrg> documeti = e.getDocPrg(p);
             List<DocumentiPrg> registri = new ArrayList<>();
             e.close();
@@ -107,6 +111,42 @@
                                     </div>
                                 </div>
                                 <div class="kt-portlet__body">
+                                    
+                                    <%if (showimporto) {%>
+                                    <h4 class='kt-font-io' style="padding-top: 20px;"> IMPORTO RICONOSCIUTO AL SOGGETTO ATTUATORE:</h4>
+                                    <span class="help-block"><label>(formato € ___.__1.234,56)</label></span>
+                                    <form method="post" action="<%=request.getContextPath()%>/OperazioniMicro?type=compilaeimporto"  onsubmit="return controlla();" > 
+                                        <input type="hidden" name="idprogetto" value="<%=p.getId()%>">
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <input class="form-control obbligatory" name="kt_inputmask_7" 
+                                                       id="kt_inputmask_7" data-inputmask="'removeMaskOnSubmit': true" 
+                                                       type="text" value="<%=startimporto%>"/>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <button type="submit" class="btn btn-io"><font color='white'><i class="fa fa-save"></i> Salva</font></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
+
+                                    <script type="text/javascript">
+                                        function controlla() {
+                                            var err = false;
+                                            //29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
+                                            if ($('#kt_inputmask_7').inputmask('unmaskedvalue') !== "") {
+                                                $('#kt_inputmask_7').removeClass("is-invalid").addClass("is-valid");
+                                            } else {
+                                                $('#kt_inputmask_7').removeClass("is-valid").addClass("is-invalid");
+                                                err = true;
+                                            }
+                                            return !err;
+                                        }
+                                    </script>
+                                    <%}%>
+                                    
+                                    
+                                    
                                     <input type="hidden" id="id_progetto" value="<%=p.getId()%>">
                                     <h4 class='kt-font-io' style="padding-top: 20px;">Documenti Modificabili:</h4>
                                     <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
@@ -219,6 +259,9 @@
         <script src="<%=src%>/assets/seta/js/utility.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/app/bundle/app.bundle.js" type="text/javascript"></script>
         <!--this page-->
+        <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/input-mask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/bootstrap-datepicker.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" type="text/javascript"></script>
         <script id="uploadCL" src="<%=src%>/page/mc/js/uploadCL.js<%=no_cache%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>

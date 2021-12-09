@@ -327,15 +327,6 @@
                                         </div>
                                         <!--29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST-->
                                         <div class="row separator"><hr></div>
-                                        <div class="col-lg-6">
-                                            <div class="col-lg-6">
-                                                <label>Importo riconosciuto al SA (formato € ___.__1.234,56)</label>
-                                                <div>
-                                                    <input class="form-control col-lg-6" name="kt_inputmask_7" 
-                                                           id="kt_inputmask_7" data-inputmask="'removeMaskOnSubmit': true" type="text"/>
-                                                </div>
-                                            </div>
-                                        </div>              
                                         <div class="row" style="display: none;">
                                             <div class="col-lg-6">
                                                 <label>Sigla Controllore  (<%=new SimpleDateFormat("dd/MM/yyyy").format(new Date())%>)</label>
@@ -408,13 +399,6 @@
             function ctrlForm() {
                 var err = false;
                 err = checkObblFields() ? true : err;
-                //29-04-2020 MODIFICA - TOGLIERE IMPORTO CHECKLIST
-                if ($('#kt_inputmask_7').inputmask('unmaskedvalue') !== "") {
-                    $('#kt_inputmask_7').removeClass("is-invalid").addClass("is-valid");
-                } else {
-                    $('#kt_inputmask_7').removeClass("is-valid").addClass("is-invalid");
-                    err = true;
-                }
                 return !err;
             }
 
@@ -441,9 +425,6 @@
                                 document.body.appendChild(a);
                                 a.click();
                                 a.remove();
-//                                } else {
-//                                    swalSuccess("Checklist 2", message);
-//                                }
                             } else {
                                 swalError("Errore!", json.message);
                             }

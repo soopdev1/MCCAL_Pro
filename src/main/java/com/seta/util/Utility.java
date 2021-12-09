@@ -345,4 +345,16 @@ public class Utility {
         }
         return "DATA ERRATA";
     }
+    
+    
+    public static String estraiEccezione(Exception ec1) {
+        try {
+            String stack_nam = ec1.getStackTrace()[0].getMethodName();
+            String stack_msg = ExceptionUtils.getStackTrace(ec1);
+            return stack_nam + " - " + stack_msg;
+        } catch (Exception e) {
+        }
+        return ec1.getMessage();
+
+    }
 }
