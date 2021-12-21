@@ -639,6 +639,7 @@ public class OperazioniMicro extends HttpServlet {
     }
 
     protected void downloadTarGz_only(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         Entity e = new Entity();
         ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class, Long.parseLong(request.getParameter("id")));
         e.close();
@@ -647,7 +648,6 @@ public class OperazioniMicro extends HttpServlet {
         prgs.add(p);
 
         ByteArrayOutputStream out = createTarArchive(prgs);
-
         byte[] encoded = Base64.getEncoder().encode(out.toByteArray());
         out.close();
 
@@ -685,7 +685,7 @@ public class OperazioniMicro extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
             resp.addProperty("path", path);
-        } catch (PersistenceException | ParseException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA downloadTarGz: " + ex.getMessage());
             resp.addProperty("result", false);

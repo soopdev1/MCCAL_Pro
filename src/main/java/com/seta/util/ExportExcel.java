@@ -255,7 +255,7 @@ public class ExportExcel {
         return null;
     }
 
-    public static String createExcelAllievi(List<Allievi> allievi) throws ParseException, FileNotFoundException {
+    public static String createExcelAllievi(List<Allievi> allievi){
         Entity e = new Entity();
         double euro_ore = Double.parseDouble(e.getPath("euro_ore"));
         File template = new File(e.getPath("template_excel"));
@@ -348,8 +348,8 @@ public class ExportExcel {
             workbook.write(out);
             out.close();
             return output_name;
-        } catch (IOException ex) {
-            e.insertTracking(null, "ExportExcel createExcelAllievi: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.err.println(Utility.estraiEccezione(ex));
         }
         return "";
     }
