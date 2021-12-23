@@ -124,7 +124,7 @@
                                                 <div class="form-group row">
                                                     <div class="col-lg-3">
                                                         <label>ID Piattaforma</label>
-                                                        <input class="form-control" type="text" readonly="" value="<%=p.getSoggetto().getId()%>">
+                                                        <input class="form-control" type="text" readonly="" value="<%=p.getId()%>" />
                                                     </div>
                                                     <div class="col-lg-3">
                                                         <label>CIP</label>
