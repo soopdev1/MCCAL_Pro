@@ -10,6 +10,7 @@
     <%  Entity e = new Entity();
         String mantenance = e.getPath("mantenance");
         String manuale = e.getPath("manualeSA");
+        String manualeAMM = e.getPath("manualeAMM");
         e.close();
         if (mantenance.equals("Y")) {
             Utility.redirect(request, response, "noService.jsp");
@@ -102,6 +103,12 @@
                                         <div class="col">
                                             <input type="hidden" value="<%=request.getContextPath()%>/redirect.jsp?page=OperazioniGeneral&type=showDoc&path=<%=manuale.replaceAll("\\\\", "/")%>">
                                             <a target="_blank" href="javascript:void(0);" class="kt-login__link document"><i class="fa fa-file-pdf kt-font-danger"></i> Guida all'uso della piattaforma</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 text-center" style="margin-top:10px;">
+                                        <div class="col">
+                                            <input type="hidden" value="<%=request.getContextPath()%>/redirect.jsp?page=OperazioniGeneral&type=showDoc&path=<%=manualeAMM.replaceAll("\\\\", "/")%>">
+                                            <a target="_blank" href="javascript:void(0);" class="kt-login__link document"><i class="fa fa-file-pdf kt-font-danger"></i> Guida per la gestione amministrativa dei corsi</a>
                                         </div>
                                     </div>
                                 </div>

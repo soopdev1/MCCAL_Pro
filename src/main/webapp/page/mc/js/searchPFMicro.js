@@ -29,8 +29,10 @@ var KTDatatablesDataSourceAjaxServer = function () {
             order: [],
             columns: [
                 {defaultContent: ''},
-                {data: 'id'},
-                {data: 'descrizione'},
+                {data: 'id',
+                    className: 'text-center'},
+                {data: 'descrizione',
+                    className: 'text-center'},
                 {data: 'misto',
                     className: 'text-center',
                     render: function (data, type, row) {
@@ -44,16 +46,28 @@ var KTDatatablesDataSourceAjaxServer = function () {
                             return "NO";
                         }
                     }},
-                {data: 'ore'},
-                {data: 'start'},
-                {data: 'end'},
-                {data: 'cip'},
-                {data: 'soggetto.ragionesociale'},
-                {data: 'sede.denominazione'},
-                {data: 'stato.descrizione'},
-                {data: 'stato.de_tipo'},
-                {data: 'rendicontato'},
-                {data: 'importo_ente'}
+                {data: 'ore',
+                    className: 'text-center'},
+                {data: 'start',
+                    className: 'text-center'},
+                {data: 'end',
+                    className: 'text-center'},
+                {data: 'cip',
+                    className: 'text-center'},
+                {data: 'soggetto.ragionesociale',
+                    className: 'text-center'},
+                {data: 'sede.denominazione',
+                    className: 'text-center'},
+                {data: 'stato.descrizione',
+                    className: 'text-center'},
+                {data: 'stato.de_tipo',
+                    className: 'text-center'},
+                {data: 'rendicontato',
+                    className: 'text-center'},
+                {data: 'importo',
+                    className: 'text-center'},
+                {data: 'importo_ente',
+                    className: 'text-center'}
             ],
             drawCallback: function () {
                 $('[data-toggle="kt-tooltip"]').tooltip();
@@ -172,6 +186,13 @@ var KTDatatablesDataSourceAjaxServer = function () {
                     }
                 }, {
                     targets: 13,
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        return currencyFormatDecimal(Number(data));
+                    }
+                }
+                , {
+                    targets: 14,
                     orderable: false,
                     render: function (data, type, row, meta) {
                         return currencyFormatDecimal(Number(data));

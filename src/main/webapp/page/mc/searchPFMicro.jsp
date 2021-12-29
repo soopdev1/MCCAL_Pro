@@ -203,7 +203,7 @@
                                         <div class="kt-portlet__body kt-scroll-x">
                                             <table class="table table-striped table-bordered " cellspacing="0" id="kt_table_1" style="border-collapse: collapse;"> 
                                                 <thead>
-                                                    <tr>
+                                                     <tr>
                                                         <th class="text-uppercase text-center">Azioni</th>
                                                         <th class="text-uppercase text-center">ID</th>
                                                         <th class="text-uppercase text-center">Descrizione</th>
@@ -217,7 +217,8 @@
                                                         <th class="text-uppercase text-center">Stato</th>
                                                         <th class="text-uppercase text-center">Errore O Verificare</th>
                                                         <th class="text-uppercase text-center">Redicontato</th>
-                                                        <th class="text-uppercase text-center">Importo Ente</th>
+                                                        <th class="text-uppercase text-center">Importo Riconosciuto al SA</th>
+                                                        <th class="text-uppercase text-center">Importo Rendicontato RegCal</th>
                                                     </tr>
                                                 </thead>
                                             </table>  
