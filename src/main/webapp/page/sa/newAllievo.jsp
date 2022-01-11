@@ -149,7 +149,7 @@
                                                                             <select class="form-control kt-select2-general obbligatory" id="stato" name="stato"  style="width: 100%">
                                                                                 <option value="-">Seleziona Stato</option>
                                                                                 <%for (Comuni c : cittadinanza) {%>
-                                                                                <option value="<%=c.getIstat()%>"><%=c.getNome()%></option>
+                                                                                <option value="<%=c.getIstat()%>" data-cf="<%=c.getCodicicatastali_altri()%>"><%=c.getNome()%></option>
                                                                                 <%}%>
                                                                             </select>
                                                                         </div>

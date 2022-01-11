@@ -319,7 +319,7 @@ function checkinfoCF() {
         msg += err ? ", Giorno di nascita" : "Giorno di nascita";
         checkdata = true;
     }
-    if (data.val().substring(8) != cf.val().substring(6, 8)) {
+    if (data.val().substring(8) !== cf.val().substring(6, 8)) {
         msg += err ? ", Anno di nascita" : "Anno di nascita";
         checkdata = true;
     }
@@ -333,15 +333,15 @@ function checkinfoCF() {
     $('#regionenascita_div').removeClass("is-valid-select").removeClass("is-invalid-select");
     $('#provincianascita_div').removeClass("is-valid-select").removeClass("is-invalid-select");
     $('#comunenascita_div').removeClass("is-valid-select").removeClass("is-invalid-select");
-    if (stato.val() == "000") {
-        if ($('#comunenascita').val() != null && $('#comunenascita').val() != "-") {
+    if (stato.val() === "000") {
+        if ($('#comunenascita').val() !== null && $('#comunenascita').val() !== "-") {
             $.ajax({
                 type: "GET",
                 async: false,
                 url: context + "/OperazioniSA?type=getCodiceCatastaleComune&idcomune=" + $('#comunenascita').val(),
                 success: function (resp) {
                     $('#stato_div').removeClass("is-invalid-select").addClass("is-valid-select");
-                    if (check_comune_CF(resp,cf.val().substring(11, 15).toUpperCase())) {
+                    if (check_comune_CF(resp, cf.val().substring(11, 15).toUpperCase())) {
                         msg += err ? ", Comune di nascita" : "Comune di nascita";
                         $('#comunenascita_div').removeClass("is-valid-select").addClass("is-invalid-select");
                         err = true;
@@ -363,7 +363,9 @@ function checkinfoCF() {
             err = true;
         }
     } else {
-        if (("Z" + stato.val()) != cf.val().substring(11, 15).toUpperCase()) {
+//        if (("Z" + stato.val()) != cf.val().substring(11, 15).toUpperCase()) {
+        var cf_sel = $('#stato').find('option:selected').attr("data-cf");
+        if (cf_sel !== cf.val().substring(11, 15).toUpperCase()) {
             msg += err ? ", Stato di nascita" : "Stato di nascita";
             $('#stato_div').removeClass("is-valid-select").addClass("is-invalid-select");
             err = true;
