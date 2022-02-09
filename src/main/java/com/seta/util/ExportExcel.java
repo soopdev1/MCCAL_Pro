@@ -333,7 +333,9 @@ public class ExportExcel {
                 writeCell(row, a.getEsito().equals("Fase B") ? "A+B" : "A");
                 writeCell(row, "SI");
                 writeCell(row, "SI");
-                writeCell(row, String.format("€ %.2f", ore_tot * euro_ore));
+                BigDecimal bd = new BigDecimal(Double.valueOf(String.valueOf(ore_tot_int)) * euro_ore);
+                bd.setScale(2, RoundingMode.HALF_EVEN);
+                writeCell(row, String.format("€ %.2f", bd.doubleValue()));
 
                 cntriga++;
             }

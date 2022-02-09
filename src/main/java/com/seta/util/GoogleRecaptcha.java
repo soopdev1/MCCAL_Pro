@@ -14,6 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.URL;
 import org.json.JSONObject;
 
@@ -63,9 +64,9 @@ public class GoogleRecaptcha {
 //            System.out.println("it.refill.util.GoogleRecaptcha.isValid() "+json.toString());
             
             Boolean success = (Boolean) json.get("success");
-            Double score = (Double) json.get("score");
+            BigDecimal score = (BigDecimal) json.get("score");            
             boolean ctrl1 = success;
-            boolean ctrl2 = score >= 0.5;
+            boolean ctrl2 = score.doubleValue() >= 0.5;
             return (ctrl1 && ctrl2);
         } catch (Exception ex) {
              return false;
