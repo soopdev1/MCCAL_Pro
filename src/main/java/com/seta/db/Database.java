@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
@@ -39,15 +40,15 @@ public class Database {
 
     public Connection c = null;
 
+    private static final ResourceBundle conf = ResourceBundle.getBundle("conf.conf");
+    
     public Database() {
 
-        String user = "admin";
-        String password = "Xray8888$$!";
-        String host = "clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/professioni?useSSL=false";
+        String user = conf.getString("db.user");
+        String password = conf.getString("db.pass");
+        String host =  conf.getString("db.host") + ":3306/professioni";
 
         if (test) {
-            user = "root";
-            password = "fertilizza";
             host = "172.31.224.159:3306/professioni_sviluppo";
         }
         try {
@@ -102,13 +103,11 @@ public class Database {
         int count = 0;
         String sql = "SELECT COUNT(idallievi_pregresso) FROM allievi_pregresso";
         try {
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            if (rs.next()) {
-                count = rs.getInt(1);
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             count = 0;
             System.err.println("METHOD: " + new Object() {
@@ -144,39 +143,37 @@ public class Database {
             List<TitoliStudio> tit = e.listaTitoliStudio();
             List<CPI> cpi_list = e.listaCPI();
             List<Comuni> com = e.listaComunibyRegione("CALABRIA");
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                Allievi a = new Allievi(true);
-                a.setId(rs.getLong("idallievi_pregresso"));
-                a.setNome(rs.getString("a.nome"));
-                a.setCognome(rs.getString("a.cognome"));
-                a.setCodicefiscale(rs.getString("a.codice_fiscale"));
-                a.setDatanascita(getUtilDate(rs.getString("data_di_nascita"), "yyyy-MM-dd"));
-                String cod_studio = rs.getString("a.cod_studio");
-                TitoliStudio ts = tit.stream().filter(t -> t.getCodice().equals(cod_studio)).findAny().orElse(new TitoliStudio());
-                if (ts.getDescrizione() == null) {
-                    ts.setDescrizione(rs.getString("a.titolo_di_studio"));
-                }
-                a.setTitoloStudio(ts);
-                String comune_di_residenza = rs.getString("a.comune_di_residenza");
-                a.setComune_residenza(com.stream().filter(com1 -> com1.getNome().equalsIgnoreCase(comune_di_residenza)).findAny().orElse(new Comuni()));
-                a.setComune_domicilio(a.getComune_residenza());
-                a.setIndirizzoresidenza(rs.getString("a.indirizzo_residenza"));
-                a.setIndirizzodomicilio(rs.getString("a.indirizzo_residenza"));
-                String setCpi = rs.getString("a.cpi_di_competenza");
-                CPI cpdc = cpi_list.stream().filter(cp -> cp.getId().equalsIgnoreCase(setCpi)).findAny().orElse(new CPI());
-                if (cpdc.getDescrizione() == null) {
-                    cpdc.setDescrizione("NON INDICATO");
-                }
-                a.setCpi(cpdc);
-                a.setDocid(rs.getString("a.docid"));
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Allievi a = new Allievi(true);
+                    a.setId(rs.getLong("idallievi_pregresso"));
+                    a.setNome(rs.getString("a.nome"));
+                    a.setCognome(rs.getString("a.cognome"));
+                    a.setCodicefiscale(rs.getString("a.codice_fiscale"));
+                    a.setDatanascita(getUtilDate(rs.getString("data_di_nascita"), "yyyy-MM-dd"));
+                    String cod_studio = rs.getString("a.cod_studio");
+                    TitoliStudio ts = tit.stream().filter(t -> t.getCodice().equals(cod_studio)).findAny().orElse(new TitoliStudio());
+                    if (ts.getDescrizione() == null) {
+                        ts.setDescrizione(rs.getString("a.titolo_di_studio"));
+                    }
+                    a.setTitoloStudio(ts);
+                    String comune_di_residenza = rs.getString("a.comune_di_residenza");
+                    a.setComune_residenza(com.stream().filter(com1 -> com1.getNome().equalsIgnoreCase(comune_di_residenza)).findAny().orElse(new Comuni()));
+                    a.setComune_domicilio(a.getComune_residenza());
+                    a.setIndirizzoresidenza(rs.getString("a.indirizzo_residenza"));
+                    a.setIndirizzodomicilio(rs.getString("a.indirizzo_residenza"));
+                    String setCpi = rs.getString("a.cpi_di_competenza");
+                    CPI cpdc = cpi_list.stream().filter(cp -> cp.getId().equalsIgnoreCase(setCpi)).findAny().orElse(new CPI());
+                    if (cpdc.getDescrizione() == null) {
+                        cpdc.setDescrizione("NON INDICATO");
+                    }
+                    a.setCpi(cpdc);
+                    a.setDocid(rs.getString("a.docid"));
 //                a.setIscrizionegg(null);
 
-                out.add(a);
+out.add(a);
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -192,13 +189,11 @@ public class Database {
         List<Fadroom> out = new ArrayList<>();
         try {
             String sql = "SELECT * FROM fad_multi a WHERE stato='0'";
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                out.add(new Fadroom(rs.getString(1), String.valueOf(rs.getInt(2)), rs.getString(3), rs.getString(5)));
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    out.add(new Fadroom(rs.getString(1), String.valueOf(rs.getInt(2)), rs.getString(3), rs.getString(5)));
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -215,13 +210,11 @@ public class Database {
         List<Item> out = new ArrayList<>();
         try {
             String sql = "SELECT * FROM fad_report";
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                out.add(new Item(rs.getString(1), rs.getString(2), ""));
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    out.add(new Item(rs.getString(1), rs.getString(2), ""));
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -238,13 +231,11 @@ public class Database {
         String out = null;
         try {
             String sql = "SELECT base64 FROM fad_report WHERE idprogetti_formativi = " + idpr;
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                out = rs.getString(1);
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    out = rs.getString(1);
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -261,13 +252,11 @@ public class Database {
         List<Item> out = new ArrayList<>();
         try {
             String sql = "SELECT idprogetti_formativi,nomestanza FROM fad a WHERE stato='0'";
-            Statement st = this.c.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                out.add(new Item(String.valueOf(rs.getInt(1)), rs.getString(2), rs.getString(2)));
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    out.add(new Item(String.valueOf(rs.getInt(1)), rs.getString(2), rs.getString(2)));
+                }
             }
-            rs.close();
-            st.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -325,29 +314,29 @@ public class Database {
         List<FadCalendar> out = new ArrayList<>();
         try {
             String sql = "SELECT * FROM fad_calendar f WHERE f.idprogetti_formativi = ? ORDER BY numerocorso,DATA";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setString(1, id);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                if (rs.getString("orainizio").contains(";")) {
-                    List<String> orainizio = Splitter.on(";").splitToList(rs.getString("orainizio"));
-                    List<String> orafine = Splitter.on(";").splitToList(rs.getString("orafine"));
-                    for (int x = 0; x < orainizio.size(); x++) {
-                        out.add(new FadCalendar(
-                                id,
-                                rs.getString("numerocorso"),
-                                formatStringtoStringDate(rs.getString("data"), patternSql, patternITA, false),
-                                orainizio.get(x),
-                                orafine.get(x))
-                        );
+            try (PreparedStatement ps = this.c.prepareStatement(sql)) {
+                ps.setString(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        if (rs.getString("orainizio").contains(";")) {
+                            List<String> orainizio = Splitter.on(";").splitToList(rs.getString("orainizio"));
+                            List<String> orafine = Splitter.on(";").splitToList(rs.getString("orafine"));
+                            for (int x = 0; x < orainizio.size(); x++) {
+                                out.add(new FadCalendar(
+                                        id,
+                                        rs.getString("numerocorso"),
+                                        formatStringtoStringDate(rs.getString("data"), patternSql, patternITA, false),
+                                        orainizio.get(x),
+                                        orafine.get(x))
+                                );
+                            }
+                        } else {
+                            out.add(new FadCalendar(id, rs.getString("numerocorso"), formatStringtoStringDate(rs.getString("data"), patternSql, patternITA, false),
+                                    rs.getString("orainizio"), rs.getString("orafine")));
+                        }
                     }
-                } else {
-                    out.add(new FadCalendar(id, rs.getString("numerocorso"), formatStringtoStringDate(rs.getString("data"), patternSql, patternITA, false),
-                            rs.getString("orainizio"), rs.getString("orafine")));
                 }
             }
-            rs.close();
-            ps.close();
         } catch (SQLException ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -360,47 +349,47 @@ public class Database {
     }
 
     public boolean insertcalendarioFAD(String idpr, String corso, String data, String orainizio, String orafine) {
-        boolean out = false;
+        boolean out;
         try {
             String sql = "SELECT * FROM fad_calendar WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ?";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setString(1, idpr);
-            ps.setString(2, corso);
-            ps.setString(3, data);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                String orainizio_old = rs.getString("orainizio");
-                String orafine_old = rs.getString("orafine");
-                String orainizio_new = orainizio_old + ";" + orainizio;
-                String orafine_new = orafine_old + ";" + orafine;
-                String update = "UPDATE fad_calendar SET orainizio = ?, orafine = ? "
-                        + "WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
-                PreparedStatement ps1 = this.c.prepareStatement(update);
-                ps1.setString(1, orainizio_new);
-                ps1.setString(2, orafine_new);
-                ps1.setString(3, idpr);
-                ps1.setString(4, corso);
-                ps1.setString(5, data);
-                ps1.setString(6, orainizio_old);
-                ps1.setString(7, orafine_old);
-                ps1.executeUpdate();
-                out = true;
-                ps1.close();
-
-            } else {
-                String del = "INSERT INTO fad_calendar VALUES (?,?,?,?,?)";
-                PreparedStatement ps1 = this.c.prepareStatement(del);
-                ps1.setString(1, idpr);
-                ps1.setString(2, corso);
-                ps1.setString(3, data);
-                ps1.setString(4, orainizio);
-                ps1.setString(5, orafine);
-                ps1.execute();
-                out = true;
-                ps1.close();
+            try (PreparedStatement ps = this.c.prepareStatement(sql)) {
+                ps.setString(1, idpr);
+                ps.setString(2, corso);
+                ps.setString(3, data);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String orainizio_old = rs.getString("orainizio");
+                        String orafine_old = rs.getString("orafine");
+                        String orainizio_new = orainizio_old + ";" + orainizio;
+                        String orafine_new = orafine_old + ";" + orafine;
+                        String update = "UPDATE fad_calendar SET orainizio = ?, orafine = ? "
+                                + "WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
+                        try (PreparedStatement ps1 = this.c.prepareStatement(update)) {
+                            ps1.setString(1, orainizio_new);
+                            ps1.setString(2, orafine_new);
+                            ps1.setString(3, idpr);
+                            ps1.setString(4, corso);
+                            ps1.setString(5, data);
+                            ps1.setString(6, orainizio_old);
+                            ps1.setString(7, orafine_old);
+                            ps1.executeUpdate();
+                            out = true;
+                        }
+                        
+                    } else {
+                        String del = "INSERT INTO fad_calendar VALUES (?,?,?,?,?)";
+                        try (PreparedStatement ps1 = this.c.prepareStatement(del)) {
+                            ps1.setString(1, idpr);
+                            ps1.setString(2, corso);
+                            ps1.setString(3, data);
+                            ps1.setString(4, orainizio);
+                            ps1.setString(5, orafine);
+                            ps1.execute();
+                            out = true;
+                        }
+                    }
+                }
             }
-            rs.close();
-            ps.close();
         } catch (Exception ex) {
             System.err.println("METHOD: " + new Object() {
             }
@@ -418,56 +407,56 @@ public class Database {
         boolean out = false;
         try {
             String sql = "SELECT * FROM fad_calendar WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio LIKE ?";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setString(1, idpr);
-            ps.setString(2, corso);
-            ps.setString(3, data);
-            ps.setString(4, "%" + inizio + "%");
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                String orainizio = rs.getString("orainizio");
-                String orafine = rs.getString("orafine");
-                if (orainizio.contains(";")) {
-                    LinkedList<String> orainizio_list = new LinkedList<>();
-                    orainizio_list.addAll(Splitter.on(";").splitToList(orainizio));
-                    LinkedList<String> orafine_list = new LinkedList<>();
-                    orafine_list.addAll(Splitter.on(";").splitToList(orafine));
-                    int indice = orainizio_list.indexOf(inizio);
-                    if (indice >= 0) {
-                        orainizio_list.remove(indice);
-                        orafine_list.remove(indice);
-                        String orainizio_new = String.join(";", orainizio_list);
-                        String orafine_new = String.join(";", orafine_list);
-                        String update = "UPDATE fad_calendar SET orainizio = ?, orafine = ? "
-                                + "WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
-                        PreparedStatement ps1 = this.c.prepareStatement(update);
-                        ps1.setString(1, orainizio_new);
-                        ps1.setString(2, orafine_new);
-                        ps1.setString(3, idpr);
-                        ps1.setString(4, corso);
-                        ps1.setString(5, data);
-                        ps1.setString(6, orainizio);
-                        ps1.setString(7, orafine);
-                        ps1.executeUpdate();
-                        out = true;
-                        ps1.close();
+            try (PreparedStatement ps = this.c.prepareStatement(sql)) {
+                ps.setString(1, idpr);
+                ps.setString(2, corso);
+                ps.setString(3, data);
+                ps.setString(4, "%" + inizio + "%");
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String orainizio = rs.getString("orainizio");
+                        String orafine = rs.getString("orafine");
+                        if (orainizio.contains(";")) {
+                            LinkedList<String> orainizio_list = new LinkedList<>();
+                            orainizio_list.addAll(Splitter.on(";").splitToList(orainizio));
+                            LinkedList<String> orafine_list = new LinkedList<>();
+                            orafine_list.addAll(Splitter.on(";").splitToList(orafine));
+                            int indice = orainizio_list.indexOf(inizio);
+                            if (indice >= 0) {
+                                orainizio_list.remove(indice);
+                                orafine_list.remove(indice);
+                                String orainizio_new = String.join(";", orainizio_list);
+                                String orafine_new = String.join(";", orafine_list);
+                                String update = "UPDATE fad_calendar SET orainizio = ?, orafine = ? "
+                                        + "WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
+                                try (PreparedStatement ps1 = this.c.prepareStatement(update)) {
+                                    ps1.setString(1, orainizio_new);
+                                    ps1.setString(2, orafine_new);
+                                    ps1.setString(3, idpr);
+                                    ps1.setString(4, corso);
+                                    ps1.setString(5, data);
+                                    ps1.setString(6, orainizio);
+                                    ps1.setString(7, orafine);
+                                    ps1.executeUpdate();
+                                    out = true;
+                                }
+                            }
+                        } else {
+                            String del = "DELETE FROM fad_calendar WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
+                            try (PreparedStatement ps1 = this.c.prepareStatement(del)) {
+                                ps1.setString(1, idpr);
+                                ps1.setString(2, corso);
+                                ps1.setString(3, data);
+                                ps1.setString(4, orainizio);
+                                ps1.setString(5, orafine);
+                                System.out.println(ps1.toString());
+                                ps1.execute();
+                                out = true;
+                            }
+                        }
                     }
-                } else {
-                    String del = "DELETE FROM fad_calendar WHERE idprogetti_formativi = ? AND numerocorso = ? AND data = ? AND orainizio = ? AND orafine = ?";
-                    PreparedStatement ps1 = this.c.prepareStatement(del);
-                    ps1.setString(1, idpr);
-                    ps1.setString(2, corso);
-                    ps1.setString(3, data);
-                    ps1.setString(4, orainizio);
-                    ps1.setString(5, orafine);
-                    System.out.println(ps1.toString());
-                    ps1.execute();
-                    out = true;
-                    ps1.close();
                 }
             }
-            rs.close();
-            ps.close();
         } catch (Exception ex) {
             System.err.println("METHOD: " + new Object() {
             }

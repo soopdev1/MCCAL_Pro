@@ -16,11 +16,11 @@ var my_start, my_end;
 function setDay() {
     old_start = new Date(millis_start);
     old_end = new Date(millis_end);
-    if (millis_start == 0) {
-        old_start.setHours(0, 0, 0);
+    if (millis_start === 0) {
+        old_start.setHours(7, 0, 0);
     }
-    if (millis_end == 0) {
-        old_end.setHours(20, 0, 0);
+    if (millis_end === 0) {
+        old_end.setHours(22, 0, 0);
     }
     start = new Date(millis_day), end = new Date(millis_day);
 

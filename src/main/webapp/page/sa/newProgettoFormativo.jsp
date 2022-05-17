@@ -239,7 +239,7 @@
                                                                                 <select class="form-control kt-select2-general obbligatory" id="sede" name="sede"  style="width: 100%">
                                                                                     <option value="-">Seleziona Sede</option>
                                                                                     <%for (SediFormazione s : sedi) {%>
-                                                                                    <option value="<%=s.getId()%>"><%=s.getDenominazione()%></option>
+                                                                                    <option value="<%=s.getId()%>"><%=s.getDenominazione()%> (<%=s.getIndirizzo()%> - <%=s.getComune().getNome()%>)</option>
                                                                                     <%}%>
                                                                                 </select>
                                                                             </div>
@@ -254,9 +254,7 @@
                                                                                 </select>
                                                                             </div>
                                                                         </div>
-                                                                        <div class="form-group row" id="knowlege_channel">
-
-                                                                        </div>
+                                                                        <div class="form-group row" id="knowlege_channel"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>

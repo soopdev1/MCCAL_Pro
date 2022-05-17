@@ -19,11 +19,11 @@ var millis_my_end = Number(document.getElementById("restristro_aula").getAttribu
 var millis_my_start = Number(document.getElementById("restristro_aula").getAttribute("data-my_start"));
 
 var old_start = new Date(millis_start), old_end = new Date(millis_end);
-if (millis_start == 0) {
-    old_start.setHours(0, 0, 0);
+if (millis_start === 0) {
+    old_start.setHours(7, 0, 0);
 }
-if (millis_end == 0) {
-    old_end.setHours(20, 0, 0);
+if (millis_end === 0) {
+    old_end.setHours(22, 0, 0);
 }
 
 var start = new Date(millis_day), end = new Date(millis_day);
