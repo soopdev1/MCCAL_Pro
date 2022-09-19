@@ -254,7 +254,13 @@ var DatatablesAllievi = function () {
                                         option += '<a class="dropdown-item " href="javascript:void(0);" style="pointer-events: none;cursor: default;"><i class="fa fa-check-circle kt-font-io-n"></i>Assegnato alla Fase B</a>';
                                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadRegistro(' + row.id + ',' + row.progetto.id + ',' + row.progetto.end_fa + ')" ><i class="flaticon-list"></i> Carica Registro giornaliero</a>';
                                     }
-
+                                } else if (row.progetto.stato.id == "FBE") {
+                                    if (row.esito == "Fase A") {
+                                        option += '<a class="dropdown-item "><i class="fa fa-check-circle kt-font-io"></i>Non assegnato alla Fase B</a>';
+                                    } else if (row.esito == "Fase B") {
+                                        option += '<a class="dropdown-item " href="javascript:void(0);" style="pointer-events: none;cursor: default;"><i class="fa fa-check-circle kt-font-io-n"></i>Assegnato alla Fase B</a>';
+                                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadRegistro(' + row.id + ',' + row.progetto.id + ',' + row.progetto.end_fa + ')" ><i class="flaticon-list"></i> Carica Registro giornaliero</a>';
+                                    }
                                 }
 
 //                                if (row.esito == "Fase A") {
