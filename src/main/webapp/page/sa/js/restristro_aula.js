@@ -5,8 +5,6 @@
  */
 var context = document.getElementById("restristro_aula").getAttribute("data-context");
 
-var offset = moment().utcOffset() * 60 * 1000;
-
 var millis_start = 0, millis_end = 0, millis_day = 0, millis_my_end = 0, millis_my_start = 0;//vengono settati nella pagina UploadRegistroAula_new.jsp
 
 var start, end;
@@ -31,8 +29,8 @@ function setDay() {
         my_start = start;
         my_end = end;
     } else {
-        my_start = new Date(millis_day + millis_my_start + offset);
-        my_end = new Date(millis_day + millis_my_end + offset);
+        my_start = new Date(millis_day + millis_my_start);
+        my_end = new Date(millis_day + millis_my_end);
     }
 }
 

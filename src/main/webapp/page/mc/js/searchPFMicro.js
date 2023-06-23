@@ -442,9 +442,9 @@ function swalDocumentPrg(idprogetto) {
         var doc_prg = getHtml("documento_prg", context);
         var registri = [];
         $.each(json, function (i, j) {
-            docente = j.docente != null ? " " + j.docente.nome + " " + j.docente.cognome : "";
-            scadenza = j.scadenza != null ? "<br>scad. " + formattedDate(new Date(j.scadenza)) : "";
-            if (j.giorno != null) {
+            docente = j.docente !== null ? " " + j.docente.nome + " " + j.docente.cognome : "";
+            scadenza = j.scadenza !== null ? "<br>scad. " + formattedDate(new Date(j.scadenza)) : "";
+            if (j.giorno !== null) {
                 registri.push(j);
 
             } else {
@@ -457,13 +457,13 @@ function swalDocumentPrg(idprogetto) {
         if (registri.length > 0) {
             $("#prg_docs").append("<div class='col-12 form-group text-left text-dark'><h3>Registri</h3></div><br>");
             $.each(registri, function (i, j) {
-                docente = j.docente != null ? " " + j.docente.nome + " " + j.docente.cognome : "";
-                giorno = j.giorno != null ? " del " + formattedDate(new Date(j.giorno)) + "<br> Docente: " : "";
+                docente = j.docente !== null ? " " + j.docente.nome + " " + j.docente.cognome : "";
+                giorno = j.giorno !== null ? " del " + formattedDate(new Date(j.giorno)) + "<br> Docente: " : "";
                 registri_aula.set(j.id, j);
                 $("#prg_docs").append(doc_registro_aula.replace("@href", context + "/OperazioniGeneral?type=showDoc&path=" + j.path)
                         .replace("@func", "showRegistroAula(" + j.id + "," + j.progetto.stato.controllare + "," + idprogetto + ")")
                         .replace("@nome", j.tipo.descrizione + giorno + docente)
-                        .replace("#color", j.validate == 0 ? "warning" : "success"));
+                        .replace("#color", j.validate === 0 ? "warning" : "success"));
             });
         }
         $('#doc_modal').modal('show');
@@ -481,9 +481,9 @@ function swalDocumentAllievo(idallievo) {
         var json = JSON.parse(resp);
         for (var i = 0; i < json.length; i++) {
             registri.set(json[i].id, json[i]);
-            giorno = json[i].giorno != null ? " del " + formattedDate(new Date(json[i].giorno)) : "";
-            color = json[i].allievo.progetto.stato.controllare == 0 ? "io" : (json[i].orericonosciute == null ? "warning" : "success");
-            if (json[i].giorno != null) {
+            giorno = json[i].giorno !== null ? " del " + formattedDate(new Date(json[i].giorno)) : "";
+            color = json[i].allievo.progetto.stato.controllare === 0 ? "io" : (json[i].orericonosciute === null ? "warning" : "success");
+            if (json[i].giorno !== null) {
                 registri_aula.set(json[i].id, json[i]);
                 $("#prg_docs").append(doc_registro_aula.replace("@href", context + "/OperazioniGeneral?type=showDoc&path=" + json[i].path)
                         .replace("@func", "showRegistro(" + json[i].id + "," + json[i].allievo.progetto.stato.controllare + ")")
@@ -502,25 +502,28 @@ function swalDocumentAllievo(idallievo) {
 function showRegistro(idregistro, controllare) {
     var registro = registri.get(idregistro);
     var doc_registro = "";
-    var totalhh = calculateHoursRegistro(registro.orariostart_mattina, registro.orarioend_mattina, registro.orariostart_pom, registro.orarioend_pom).replace(":0", ":00");
-    totalhh = totalhh.indexOf(":") == 1 ? "0" + totalhh : totalhh;
+    var totalhh = calculateHoursRegistro(registro.orariostart_mattina, registro.orarioend_mattina, registro.orariostart_pom, registro.orarioend_pom);
+    totalhh = totalhh.indexOf(":") === 1 ? "0" + totalhh : totalhh;
 
-    if (registro.orariostart_pom != null) {
+    if (registro.orariostart_pom !== null) {
         doc_registro += getHtml("doc_registro_individiale_pomeriggio", context);
-        doc_registro = doc_registro.replace("@start_pome", formattedTime(registro.orariostart_pom).replace(":0", ":00"))
-                .replace("@end_pome", formattedTime(registro.orarioend_pom).replace(":0", ":00"));
+        doc_registro = doc_registro.replace("@start_pome", 
+        formattedTime(registro.orariostart_pom))
+                .replace("@end_pome", 
+        formattedTime(registro.orarioend_pom));
     } else {
         doc_registro = getHtml("doc_registro_individiale_mattina", context);
     }
-    doc_registro = controllare == 1 ? (doc_registro + getHtml("doc_registro_individiale_ctrlore", context)) : doc_registro;
-    doc_registro = doc_registro.replace("@start_pome", formattedTime(registro.orariostart_pom).replace(":0", ":00"))
+    doc_registro = controllare === 1 ? (doc_registro + getHtml("doc_registro_individiale_ctrlore", context)) : doc_registro;
+    doc_registro = doc_registro.replace("@start_pome", 
+    formattedTime(registro.orariostart_pom))
             .replace("@date", formattedDate(new Date(registro.giorno)))
             .replace("@docente", registro.docente.cognome + " " + registro.docente.nome)
-            .replace("@start_mattina", formattedTime(registro.orariostart_mattina).replace(":0", ":00"))
-            .replace("@end_mattina", formattedTime(registro.orarioend_mattina).replace(":0", ":00"))
+            .replace("@start_mattina", formattedTime(registro.orariostart_mattina))
+            .replace("@end_mattina", formattedTime(registro.orarioend_mattina))
             .replace("@tot_ore", totalhh);
     ;
-    doc_registro = registro.orericonosciute == null ? doc_registro.replace('@hh', totalhh).replace('@max', totalhh).replace("@msg", "Ore da riconoscere") : doc_registro.replace('@hh', doubletoHHmm(registro.orericonosciute)).replace('@max', totalhh).replace("@msg", "Ore riconosciute");
+    doc_registro = registro.orericonosciute === null ? doc_registro.replace('@hh', totalhh).replace('@max', totalhh).replace("@msg", "Ore da riconoscere") : doc_registro.replace('@hh', doubletoHHmm(registro.orericonosciute)).replace('@max', totalhh).replace("@msg", "Ore riconosciute");
 
     swal.fire({
         title: 'Informazioni Registro',
@@ -528,7 +531,7 @@ function showRegistro(idregistro, controllare) {
         animation: false,
         showCancelButton: false,
         confirmButtonText: '<i class="fa fa-check"></i> Conferma ore',
-        showConfirmButton: controllare == 1,
+        showConfirmButton: controllare === 1,
         showCloseButton: true,
         customClass: {
             popup: 'animated bounceInUp',
@@ -885,14 +888,14 @@ function showRegistroAula(id, control, idprogetto) {
             + "<input type='hidden' value='" + idprogetto + "' id='idprogetto'>";
     var end_form = "<div class='input-group'><a class='btn btn-io' id='submit_reg' href='javascript:void(0);'>Convalida</a></div></form>";
 
-    $('#register_docs_modal').append((control == 1 ? form : "") +
+    $('#register_docs_modal').append((control === 1 ? form : "") +
             doc.replace("@date", formattedDate(new Date(registro.giorno)))
             .replace("@start", formattedTime(registro.orariostart).replace(":0", ":00"))
             .replace("@end", formattedTime(registro.orarioend).replace(":0", ":00"))
             .replace("@docente", registro.docente.cognome + " " + registro.docente.nome)
             .replace("@ore", doubletoHHmm(registro.ore))
-            .replace("@ore_conv", registro.ore_convalidate == "00:00" ? "" : doubletoHHmm(registro.ore_convalidate))
-            .replace("@readonly", control == 1 ? "" : "readonly")
+            .replace("@ore_conv", registro.ore_convalidate === "00:00" ? "" : doubletoHHmm(registro.ore_convalidate))
+            .replace("@readonly", control === 1 ? "" : "readonly")
             .replace("@presenti",
                     registro.presenti_list.map(p => {
                         return presenze.replace("@nome", p.cognome + " " + p.nome)

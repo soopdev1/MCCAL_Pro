@@ -986,6 +986,7 @@ public class OperazioniMicro extends HttpServlet {
             String pathtemp = e.getPath("pathTemp");
             String mailjet_api = e.getPath("mailjet_api");
             String mailjet_secret = e.getPath("mailjet_secret");
+            String mailjet_name = e.getPath("mailjet_name");
             String link = e.getPath("linkfad");
             String dominio;
             if (request.getContextPath().contains("Microcredito")) {
@@ -1027,7 +1028,7 @@ public class OperazioniMicro extends HttpServlet {
                         email.getTesto().replace("@user", s),
                         email.getOggetto(),
                         SendMailJet.createEVENT(Utility.sdmysql.format(f.getInizio()), Utility.sdmysql.format(f.getFine()), email.getOggetto(), pathtemp),
-                        mailjet_api, mailjet_secret);
+                        mailjet_api, mailjet_secret, mailjet_name);
             }
 
             resp.addProperty("result", true);
@@ -1416,12 +1417,12 @@ public class OperazioniMicro extends HttpServlet {
                     String base64or = db1.getBase64Report(Integer.parseInt(idpr));
                     if (base64or == null) {
                         String insert = "INSERT INTO fad_report (idprogetti_formativi,base64,definitivo) VALUES (" + idpr + ",'" + base64 + "','Y')";
-                        try (Statement st = db1.getC().createStatement()) {
+                        try ( Statement st = db1.getC().createStatement()) {
                             st.execute(insert);
                         }
                     } else {
                         String update = "UPDATE fad_report SET base64='" + base64 + "' WHERE idprogetti_formativi=" + idpr;
-                        try (Statement st = db1.getC().createStatement()) {
+                        try ( Statement st = db1.getC().createStatement()) {
                             st.executeUpdate(update);
                         }
                     }

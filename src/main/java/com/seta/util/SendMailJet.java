@@ -74,8 +74,10 @@ public class SendMailJet {
                 .apiKey(e.getPath("mailjet_api"))
                 .apiSecretKey(e.getPath("mailjet_secret"))
                 .build();
-
+        String mailjet_name = e.getPath("mailjet_name");
+        String bccD = e.getPath("mail.bcc");
         e.close();
+        
         client = new MailjetClient(options);
         JSONArray dest = new JSONArray();
         JSONArray ccn = new JSONArray();
@@ -91,9 +93,15 @@ public class SendMailJet {
                         .put("Name", ""));
             }
         }
+        
+//        try {
+//            ccn.put(new JSONObject().put("Email", bccD)
+//                    .put("Name", ""));
+//        } catch (Exception ee1) {
+//        }
 
         JSONObject mail = new JSONObject().put(Emailv31.Message.FROM, new JSONObject()
-                .put("Email", "yisucal.supporto@microcredito.gov.it")
+                .put("Email", mailjet_name)
                 .put("Name", name))
                 .put(Emailv31.Message.TO, dest)
                 .put(Emailv31.Message.BCC, ccn)
@@ -104,10 +112,10 @@ public class SendMailJet {
             try {
                 filename = file.getName();
                 content_type = Files.probeContentType(file.toPath());
-                try (InputStream i = new FileInputStream(file)) {
+                try ( InputStream i = new FileInputStream(file)) {
                     b64 = new String(Base64.encodeBase64(IOUtils.toByteArray(i)));
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             mail.put(Emailv31.Message.ATTACHMENTS, new JSONArray()
@@ -129,83 +137,12 @@ public class SendMailJet {
         return ok;
     }
 
-//    public static boolean sendMailNoDB(String name, String[] to, String[] bcc, String txt, String subject, File file, String mailjet_api, String mailjet_secret) 
-//            throws MailjetException {
-//        MailjetClient client;
-//        MailjetRequest request;
-//        MailjetResponse response;
-//        String filename = "";
-//        String content_type = "";
-//        String b64 = "";
-//
-//        ClientOptions options = ClientOptions.builder()
-//                .apiKey(mailjet_api)
-//                .apiSecretKey(mailjet_secret)
-//                .build();
-//
-//        client = new MailjetClient(options);
-//
-//        JSONArray dest = new JSONArray();
-//        JSONArray ccn = new JSONArray();
-//
-//        for (String s : to) {
-//            dest.put(new JSONObject().put("Email", s)
-//                    .put("Name", ""));
-//        }
-//
-//        if (bcc != null) {
-//            for (String s : bcc) {
-//                ccn.put(new JSONObject().put("Email", s)
-//                        .put("Name", ""));
-//            }
-//        }
-//
-//        JSONObject mail = new JSONObject().put(Emailv31.Message.FROM, new JSONObject()
-//                .put("Email", "yisucal.supporto@microcredito.gov.it")
-//                .put("Name", name))
-//                .put(Emailv31.Message.TO, dest)
-//                .put(Emailv31.Message.BCC, ccn)
-//                .put(Emailv31.Message.SUBJECT, subject)
-//                .put(Emailv31.Message.HTMLPART, txt);
-//
-//        if (file != null) {
-//            try {
-//                filename = file.getName();
-//                content_type = Files.probeContentType(file.toPath());
-//                try (InputStream i = new FileInputStream(file)) {
-//                    b64 = new String(Base64.encodeBase64(IOUtils.toByteArray(i)));
-//                }
-//            } catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
-//            mail.put(Emailv31.Message.ATTACHMENTS, new JSONArray()
-//                    .put(new JSONObject()
-//                            .put("ContentType", content_type)
-//                            .put("Filename", filename)
-//                            .put("Base64Content", b64)));
-//        }
-//
-//        request = new MailjetRequest(Emailv31.resource)
-//                .property(Emailv31.MESSAGES, new JSONArray()
-//                        .put(mail));
-//
-//        response = client.post(request);
-//
-//        boolean ok = response.getStatus() == 200;
-//
-//        if (!ok) {
-//            System.err.println("ERRORE: sendMail - " + response.getStatus() + " -- " + response.getRawResponseContent() + " --- " + response.getData().toList());
-//        }
-//
-//        return ok;
-//    }
-    public static boolean sendMailEvento(String name, String[] to, String[] bcc, String txt, String subject, AttachMJ evento, String mailjet_api, String mailjet_secret) throws MailjetException {
+    public static boolean sendMailEvento(String name, String[] to, String[] bcc, String txt, String subject, AttachMJ evento,
+            String mailjet_api, String mailjet_secret, String mailjet_name) throws MailjetException {
 
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
-
-        String mailjet_name = "yisucal.supporto@microcredito.gov.it";
 
         ClientOptions options = ClientOptions.builder()
                 .apiKey(mailjet_api)
@@ -303,8 +240,7 @@ public class SendMailJet {
             createDir(pathtemp);
             File ics = new File(pathtemp + uuid + ".ics");
 
-            try (FileWriter fw = new FileWriter(ics);
-                    BufferedWriter bw = new BufferedWriter(fw)) {
+            try ( FileWriter fw = new FileWriter(ics);  BufferedWriter bw = new BufferedWriter(fw)) {
                 bw.write(r1);
                 bw.newLine();
                 bw.write(r2);
@@ -344,7 +280,7 @@ public class SendMailJet {
         }
         return null;
     }
-    
+
     //NOTIFICHE
     public static void notifica_Controllo_MC(Entity e, ProgettiFormativi p) {
         try {
@@ -391,7 +327,6 @@ public class SendMailJet {
                 String testohtml = email.getTesto();
                 testohtml = testohtml.replace("@inseriretuttoiltesto", testostart);
                 String[] dest = e.getPath("destinatari_cambiostato").split(";");
-//            String[] dest = {"raffaele.cosco@faultless.it"};
                 sendMail("Microcredito", dest, testohtml, email.getOggetto());
             }
         } catch (Exception ex1) {

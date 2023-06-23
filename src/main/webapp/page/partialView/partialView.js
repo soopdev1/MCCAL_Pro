@@ -12,7 +12,7 @@ function getHtml(id, context) {
         dataType: 'html',
         success: function (data) {
             $(data).each(function () {
-                if (this.id == id) {
+                if (this.id === id) {
                     elem = $(this)[0].outerHTML;
                 }
             });

@@ -1047,14 +1047,14 @@ function formattedTime(s) {
     s = (s - secs) / 60;
     var mins = s % 60;
     var hrs = (s - mins) / 60;
-    return hrs + ':' + (mins< 10 ? "0" + mins : mins);
+    return (hrs < 10 ? "0" + hrs : hrs) + ':' + (mins < 10 ? "0" + mins : mins);
 }
 
 
 function calculateHoursRegistro(s1_start, s1_end, s2_start, s2_end) {
 //    var utc = (+1.00 * 60) * 60 * 1000; //TIMEZONE +1
     var hours = s1_end - s1_start;
-    if (s2_start != null || s2_end != null) {
+    if (s2_start !== null || s2_end !== null) {
         hours += (s2_end - s2_start);
     }
 //    hours += utc;
@@ -1064,8 +1064,7 @@ function calculateHoursRegistro(s1_start, s1_end, s2_start, s2_end) {
     hours = (hours - secs) / 60;
     var mins = hours % 60;
     var hrs = (hours - mins) / 60;
-
-    return hrs + ':' + mins;
+    return (hrs < 10 ? "0" + hrs : hrs) + ':' + (mins < 10 ? "0" + mins : mins);
 }
 
 function tConvert(time) {
