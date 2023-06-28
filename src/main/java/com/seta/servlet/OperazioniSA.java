@@ -34,6 +34,7 @@ import com.seta.domain.User;
 import com.seta.entity.Presenti;
 import com.seta.util.SendMailJet;
 import com.seta.util.Utility;
+import static com.seta.util.Utility.estraiEccezione;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -853,7 +854,15 @@ public class OperazioniSA extends HttpServlet {
             }
 
             p.setDocenti(docenti_list);
-            p.getDocumenti().addAll(documenti);
+            try {
+                ArrayList<DocumentiPrg> documenti_F = new ArrayList<>();
+                documenti_F.addAll(p.getDocumenti());
+                documenti_F.addAll(documenti);
+                p.setDocumenti(documenti_F);
+            } catch (Exception ex0) {
+                e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()),
+                        "OperazioniSA modifyDocenti: " + estraiEccezione(ex0));
+            }
             e.merge(p);
             e.commit();
             resp.addProperty("result", true);
