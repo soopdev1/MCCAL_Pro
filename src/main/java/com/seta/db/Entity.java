@@ -446,7 +446,7 @@ public class Entity {
             sql += "a.codicefiscale = :codicefiscale";
             param.put("codicefiscale", cf);
         }
-
+        
         TypedQuery<Allievi> q = this.em.createQuery(sql, Allievi.class);
 
         if (param.isEmpty()) {

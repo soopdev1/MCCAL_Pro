@@ -64,7 +64,7 @@ public class Database {
             p.put("serverTimezone", "UTC");
             p.put("zeroDateTimeBehavior", "convertToNull");
             this.c = DriverManager.getConnection("jdbc:mysql://" + host, p);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
+        } catch (Exception ex) {
             //ex.printStackTrace();
             if (this.c != null) {
                 try {
